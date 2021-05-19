@@ -47,29 +47,13 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
 
-# get channel_secret and channel_access_token from your environment variable
-channel_secret = os.getenv('LINE_CHANNEL_SECRET', '8893c3c1421c8b2121793e3060c24893')
-channel_access_token = os.getenv(
-    'LINE_CHANNEL_ACCESS_TOKEN', 'iKKtciUxaXGDNNJAwJeEWyEYjeJP2LX/HUZJFeKTFTZOjtL17KY/3i181F+NO+wSiFINyjnanZfD77I3LfTMslP/L2bUYqsO/xSCd8MKKZqKvo84Dp7Dbn6ftAi9KrtDowO3BgfZsCuMfSDij0PWJQdB04t89/1O/w1cDnyilFU=')
-if channel_secret is None or channel_access_token is None:
-    print('Specify LINE_CHANNEL_SECRET and LINE_CHANNEL_ACCESS_TOKEN as environment variables.')
-    sys.exit(1)
+channel_secret = '8893c3c1421c8b2121793e3060c24893'
+channel_access_token = 'iKKtciUxaXGDNNJAwJeEWyEYjeJP2LX/HUZJFeKTFTZOjtL17KY/3i181F+NO+wSiFINyjnanZfD77I3LfTMslP/L2bUYqsO/xSCd8MKKZqKvo84Dp7Dbn6ftAi9KrtDowO3BgfZsCuMfSDij0PWJQdB04t89/1O/w1cDnyilFU='
 
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
-
-
-# function for create tmp dir for download content
-def make_static_tmp_dir():
-    try:
-        os.makedirs(static_tmp_path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
-            pass
-        else:
-            raise
 
 
 @app.route("/callback", methods=['POST'])
@@ -223,8 +207,6 @@ def handle_text_message(event):
         template_message = TemplateSendMessage(
             alt_text='ImageCarousel alt text', template=image_carousel_template)
         line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'imagemap':
-        pass
     elif text == 'flex':
         bubble = BubbleContainer(
             direction='ltr',
@@ -487,44 +469,6 @@ def handle_text_message(event):
                             action=LocationAction(label="label6")
                         ),
                     ])))
-    elif text == 'link_token' and isinstance(event.source, SourceUser):
-        link_token_response = line_bot_api.issue_link_token(event.source.user_id)
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='link_token: ' + link_token_response.link_token)
-            ]
-        )
-    elif text == 'insight_message_delivery':
-        today = datetime.date.today().strftime("%Y%m%d")
-        response = line_bot_api.get_insight_message_delivery(today)
-        if response.status == 'ready':
-            messages = [
-                TextSendMessage(text='broadcast: ' + str(response.broadcast)),
-                TextSendMessage(text='targeting: ' + str(response.targeting)),
-            ]
-        else:
-            messages = [TextSendMessage(text='status: ' + response.status)]
-        line_bot_api.reply_message(event.reply_token, messages)
-    elif text == 'insight_followers':
-        today = datetime.date.today().strftime("%Y%m%d")
-        response = line_bot_api.get_insight_followers(today)
-        if response.status == 'ready':
-            messages = [
-                TextSendMessage(text='followers: ' + str(response.followers)),
-                TextSendMessage(text='targetedReaches: ' + str(response.targeted_reaches)),
-                TextSendMessage(text='blocks: ' + str(response.blocks)),
-            ]
-        else:
-            messages = [TextSendMessage(text='status: ' + response.status)]
-        line_bot_api.reply_message(event.reply_token, messages)
-    elif text == 'insight_demographic':
-        response = line_bot_api.get_insight_demographic()
-        if response.available:
-            messages = ["{gender}: {percentage}".format(gender=it.gender, percentage=it.percentage)
-                        for it in response.genders]
-        else:
-            messages = [TextSendMessage(text='available: false')]
-        line_bot_api.reply_message(event.reply_token, messages)
     else:
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=event.message.text))
@@ -603,24 +547,7 @@ def handle_file_message(event):
 def handle_follow(event):
     app.logger.info("Got Follow event:" + event.source.user_id)
     line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text='Got follow event'))
-
-
-@handler.add(UnfollowEvent)
-def handle_unfollow(event):
-    app.logger.info("Got Unfollow event:" + event.source.user_id)
-
-
-@handler.add(JoinEvent)
-def handle_join(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='Joined this ' + event.source.type))
-
-
-@handler.add(LeaveEvent)
-def handle_leave():
-    app.logger.info("Got leave event")
+        event.reply_token, TextSendMessage(text='歡迎趴波'))
 
 
 @handler.add(PostbackEvent)
@@ -636,46 +563,10 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text=event.postback.params['date']))
 
 
-@handler.add(BeaconEvent)
-def handle_beacon(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(
-            text='Got beacon event. hwid={}, device_message(hex string)={}'.format(
-                event.beacon.hwid, event.beacon.dm)))
-
-
-@handler.add(MemberJoinedEvent)
-def handle_member_joined(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(
-            text='Got memberJoined event. event={}'.format(
-                event)))
-
-
-@handler.add(MemberLeftEvent)
-def handle_member_left(event):
-    app.logger.info("Got memberLeft event")
-
-
 @app.route('/static/<path:path>')
 def send_static_content(path):
     return send_from_directory('static', path)
 
-
-# if __name__ == "__main__":
-#     arg_parser = ArgumentParser(
-#         usage='Usage: python ' + __file__ + ' [--port <port>] [--help]'
-#     )
-#     arg_parser.add_argument('-p', '--port', type=int, default=8000, help='port')
-#     arg_parser.add_argument('-d', '--debug', default=False, help='debug')
-#     options = arg_parser.parse_args()
-
-#     # create tmp dir for download content
-#     make_static_tmp_dir()
-
-#     app.run(debug=options.debug, port=options.port)
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
