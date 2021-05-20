@@ -589,7 +589,7 @@ def handle_content_message(event):
             center[k] += pos[k][i]
         center[k] = center[k]/num
 
-    print("center"+center)
+    print("center", center)
 
     minimum_dis = float('inf')
     minimum_i = 0
@@ -600,6 +600,7 @@ def handle_content_message(event):
             x = i*100+50
             y = j*100+50
             dis = ((x-center[0])**2 + (y-center[1])**2)
+            print(i, j, dis)
             if dis < minimum_dis:
                 minimum_dis = dis
                 minimum_i, minimum_j = i, j
