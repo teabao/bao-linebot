@@ -127,12 +127,12 @@ def handle_text_message(event):
             line_bot_api.push_message(opponent['user_id'], TextSendMessage(text='你配對到了'+myself['name']))
 
             user[myself['user_id']] = myself
-            user[myself['is_gaming']] = True
-            user[myself['my_turn']] = True
+            user[myself['user_id']]['is_gaming'] = True
+            user[myself['user_id']]['my_turn'] = True
 
             user[opponent['user_id']] = opponent
-            user[opponent['is_gaming']] = True
-            user[opponent['my_turn']] = False
+            user[opponent['user_id']]['is_gaming'] = True
+            user[opponent['user_id']]['my_turn'] = False
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
