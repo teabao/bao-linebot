@@ -169,7 +169,7 @@ def handle_text_message(event):
 
     if text == '配對':
 
-        if user_waiting[0]['user_id'] == line_bot_api.get_profile(event.source.user_id).display_name:
+        if user_waiting and user_waiting[0]['user_id'] == line_bot_api.get_profile(event.source.user_id).display_name:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
 
         elif user_waiting:
@@ -191,7 +191,10 @@ def handle_text_message(event):
                 ]
             )
 
-            line_bot_api.push_message(opponent['user_id'], TextSendMessage(text='你配對到了'+myself['name']))
+            line_bot_api.push_message(opponent['user_id'], [
+                TextSendMessage(text='你配對到了'+myself['name']),
+                TextSendMessage(text='等待你的對手...')
+            ])
 
             user[myself['user_id']] = myself
             user[myself['user_id']]['is_gaming'] = True
@@ -402,7 +405,8 @@ def handle_content_message(event):
 
         # ImageSendMessage(url2, url2),
         ImageSendMessage(url, url),
-        TextSendMessage(text='輪到你了')
+        TextSendMessage(text='輪到你了'),
+        TextSendMessage(text='在圖片上畫圈圈叉叉後回傳~')
     ])
 
     user[id]['my_turn'] = False
