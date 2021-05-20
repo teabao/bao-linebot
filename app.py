@@ -145,30 +145,6 @@ def handle_text_message(event):
                 'user_id': event.source.user_id
             })
 
-    elif text == 'pair':
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
-
-    elif text == 'profile':
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='Display name: ' + profile.display_name),
-                    TextSendMessage(text='Status message: ' + str(profile.status_message))
-                ]
-            )
-        else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't use profile API without user ID"))
-    elif text == 'q':
-        quota = line_bot_api.get_message_quota()
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='type: ' + quota.type),
-                TextSendMessage(text='value: ' + str(quota.value))
-            ]
-        )
     elif text == 'qc':
         quota_consumption = line_bot_api.get_message_quota_consumption()
         line_bot_api.reply_message(
@@ -176,131 +152,7 @@ def handle_text_message(event):
                 TextSendMessage(text='total usage: ' + str(quota_consumption.total_usage)),
             ]
         )
-    elif text == 'push':
-        line_bot_api.push_message(
-            event.source.user_id, [
-                TextSendMessage(text='PUSH!'),
-            ]
-        )
-    elif text == 'multicast':
-        line_bot_api.multicast(
-            [event.source.user_id], [
-                TextSendMessage(text='THIS IS A MULTICAST MESSAGE'),
-            ]
-        )
-    elif text == 'broadcast':
-        line_bot_api.broadcast(
-            [
-                TextSendMessage(text='THIS IS A BROADCAST MESSAGE'),
-            ]
-        )
-    elif text.startswith('broadcast '):  # broadcast 20190505
-        date = text.split(' ')[1]
-        print("Getting broadcast result: " + date)
-        result = line_bot_api.get_message_delivery_broadcast(date)
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='Number of sent broadcast messages: ' + date),
-                TextSendMessage(text='status: ' + str(result.status)),
-                TextSendMessage(text='success: ' + str(result.success)),
-            ]
-        )
-    elif text == 'image':
-        url = request.url_root + '/static/logo.png'
-        app.logger.info("url=" + url)
-        line_bot_api.reply_message(
-            event.reply_token,
-            ImageSendMessage(url, url)
-        )
-    elif text == 'confirm':
-        confirm_template = ConfirmTemplate(text='Do it?', actions=[
-            MessageAction(label='Yes', text='Yes!'),
-            MessageAction(label='No', text='No!'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Confirm alt text', template=confirm_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-    elif text == 'carousel':
-        carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='hoge1', title='fuga1', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping')
-            ]),
-            CarouselColumn(text='hoge2', title='fuga2', actions=[
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ]),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'image_carousel':
-        image_carousel_template = ImageCarouselTemplate(columns=[
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='datetime',
-                                                            data='datetime_postback',
-                                                            mode='datetime')),
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='date',
-                                                            data='date_postback',
-                                                            mode='date'))
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='ImageCarousel alt text', template=image_carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'flex':
-        bubble = BubbleContainer(
-            direction='ltr',
-            hero=ImageComponent(
-                url=request.url_root + '/static/poster.jpg',
-                size='full',
-                aspect_ratio='20:13',
-                aspect_mode='cover'
-            ),
-            body=BoxComponent(
-                layout='vertical',
-                contents=[
-                    TextComponent(text='Tic Tac Toe', weight='bold', size='xl'),
-                    BoxComponent(
-                        layout='vertical',
-                        margin='lg',
-                        spacing='sm',
-                        contents=[
-                            TextComponent(
-                                text='在線上隨機配對玩家，挑戰你的對手！',
-                                color='#aaaaaa',
-                                size='sm',
-                                flex=1
-                            )
-                        ],
-                    )
-                ],
-            ),
-            footer=BoxComponent(
-                layout='vertical',
-                spacing='sm',
-                contents=[
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
-                    ),
-                    SeparatorComponent(),
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=MessageAction(label='尋找配對', text='配對')
-                    )
-                ]
-            ),
-        )
-        message = FlexSendMessage(alt_text="hello", contents=bubble)
-        line_bot_api.reply_message(
-            event.reply_token,
-            message
-        )
-    elif text == 'flex_update_1':
+    elif text == 'f':
         bubble_string = """
         {
           "type": "bubble",
@@ -310,7 +162,7 @@ def handle_text_message(event):
             "contents": [
               {
                 "type": "image",
-                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip3.jpg",
+                "url": '"""+request.url_root + '/static/win.jpg'+"""',
                 "position": "relative",
                 "size": "full",
                 "aspectMode": "cover",
@@ -391,67 +243,59 @@ def handle_text_message(event):
             event.reply_token,
             message
         )
-    elif text == 'quick_reply':
+    else:
+        bubble = BubbleContainer(
+            direction='ltr',
+            hero=ImageComponent(
+                url=request.url_root + '/static/poster.jpg',
+                size='full',
+                aspect_ratio='20:13',
+                aspect_mode='cover'
+            ),
+            body=BoxComponent(
+                layout='vertical',
+                contents=[
+                    TextComponent(text='Tic Tac Toe (井字遊戲)', weight='bold', size='xl'),
+                    BoxComponent(
+                        layout='vertical',
+                        margin='lg',
+                        spacing='sm',
+                        contents=[
+                            TextComponent(
+                                text='在線上隨機配對玩家，挑戰你的對手！',
+                                color='#aaaaaa',
+                                size='sm',
+                                flex=1
+                            )
+                        ],
+                    )
+                ],
+            ),
+            footer=BoxComponent(
+                layout='vertical',
+                spacing='sm',
+                contents=[
+                    ButtonComponent(
+                        style='link',
+                        height='sm',
+                        action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
+                    ),
+                    SeparatorComponent(),
+                    ButtonComponent(
+                        style='link',
+                        height='sm',
+                        action=MessageAction(label='尋找配對', text='配對')
+                    )
+                ]
+            ),
+        )
+        message = FlexSendMessage(alt_text="hello", contents=bubble)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(
-                text='Quick reply',
-                quick_reply=QuickReply(
-                    items=[
-                        QuickReplyButton(
-                            action=PostbackAction(label="label1", data="data1")
-                        ),
-                        QuickReplyButton(
-                            action=MessageAction(label="label2", text="text2")
-                        ),
-                        QuickReplyButton(
-                            action=DatetimePickerAction(label="label3",
-                                                        data="data3",
-                                                        mode="date")
-                        ),
-                        QuickReplyButton(
-                            action=CameraAction(label="label4")
-                        ),
-                        QuickReplyButton(
-                            action=CameraRollAction(label="label5")
-                        ),
-                        QuickReplyButton(
-                            action=LocationAction(label="label6")
-                        ),
-                    ])))
-    else:
-        buttons_template = ButtonsTemplate(
-            title='My buttons sample', text='Hello, my buttons', actions=[
-                URIAction(label='Github', uri='https://github.com/teabao/bao-linebot'),
-                MessageAction(label='尋找配對', text='配對')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-
-@handler.add(MessageEvent, message=LocationMessage)
-def handle_location_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        LocationSendMessage(
-            title='Location', address=event.message.address,
-            latitude=event.message.latitude, longitude=event.message.longitude
+            message
         )
-    )
 
 
-@handler.add(MessageEvent, message=StickerMessage)
-def handle_sticker_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        StickerSendMessage(
-            package_id=event.message.package_id,
-            sticker_id=event.message.sticker_id)
-    )
-
-
-# Image Message Type
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_content_message(event):
     id = event.source.user_id
@@ -605,27 +449,56 @@ def handle_content_message(event):
 @ handler.add(FollowEvent)
 def handle_follow(event):
     app.logger.info("Got Follow event:" + event.source.user_id)
+    bubble = BubbleContainer(
+        direction='ltr',
+        hero=ImageComponent(
+            url=request.url_root + '/static/poster.jpg',
+            size='full',
+            aspect_ratio='20:13',
+            aspect_mode='cover'
+        ),
+        body=BoxComponent(
+            layout='vertical',
+            contents=[
+                TextComponent(text='Tic Tac Toe (井字遊戲)', weight='bold', size='xl'),
+                BoxComponent(
+                    layout='vertical',
+                    margin='lg',
+                    spacing='sm',
+                    contents=[
+                        TextComponent(
+                            text='在線上隨機配對玩家，挑戰你的對手！',
+                            color='#aaaaaa',
+                            size='sm',
+                            flex=1
+                        )
+                    ],
+                )
+            ],
+        ),
+        footer=BoxComponent(
+            layout='vertical',
+            spacing='sm',
+            contents=[
+                ButtonComponent(
+                    style='link',
+                    height='sm',
+                    action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
+                ),
+                SeparatorComponent(),
+                ButtonComponent(
+                    style='link',
+                    height='sm',
+                    action=MessageAction(label='尋找配對', text='配對')
+                )
+            ]
+        ),
+    )
+    message = FlexSendMessage(alt_text="hello", contents=bubble)
     line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text='歡迎加入'))
-
-
-@ handler.add(PostbackEvent)
-def handle_postback(event):
-    if event.postback.data == 'ping':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text='pong'))
-    elif event.postback.data == 'datetime_postback':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
-    elif event.postback.data == 'date_postback':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.params['date']))
-    elif event.postback.data == 'confirm_wait':
-        user_waiting.append({
-            'name': line_bot_api.get_profile(event.source.user_id).display_name,
-            'user_id': event.source.user_id,
-            'reply_token': event.reply_token
-        })
+        event.reply_token,
+        message
+    )
 
 
 @ app.route('/static/<path:path>')
