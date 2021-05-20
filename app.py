@@ -169,7 +169,10 @@ def handle_text_message(event):
 
     if text == '配對':
 
-        if user_waiting:
+        if user_waiting[0]['user_id'] == line_bot_api.get_profile(event.source.user_id).display_name:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
+
+        elif user_waiting:
             opponent = user_waiting.pop(0)
             myself = {
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
