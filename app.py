@@ -153,66 +153,56 @@ def handle_text_message(event):
             ]
         )
     elif text == 'f':
-        bubble_string = """
-        {
-          "type": "bubble",
-          "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "image",
-                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip3.jpg",
-                "position": "relative",
-                "size": "full",
-                "aspectMode": "cover",
-                "aspectRatio": "1:1",
-                "gravity": "center"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "遊戲結束",
-                        "weight": "bold",
-                        "size": "xl",
-                        "color": "#ffffff"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "你贏了",
-                        "color": "#ebebeb",
-                        "size": "xl",
-                        "align": "end"
-                      }
-                    ]
-                  }
+        bubble = BubbleContainer(
+            body=BoxComponent(
+                layout='vertical',
+                paddingAll="0px",
+                contents=[
+                    ImageComponent(
+                        url=request.url_root + '/static/win.jpg',
+                        position="relative",
+                        size="full",
+                        aspectMode="cover",
+                        aspectRatio="1:1",
+                        gravity="center"
+                    ),
+                    BoxComponent(
+                        layout='horizontal',
+                        position="absolute",
+                        offsetBottom="0px",
+                        offsetStart="0px",
+                        offsetEnd="0px",
+                        backgroundColor="#00000099",
+                        paddingAll="20px",
+                        contents=[
+                            BoxComponent(
+                                layout='vertical',
+                                contents=[
+                                    TextComponent(
+                                        text="遊戲結束",
+                                        weight="bold",
+                                        size="xl",
+                                        color="#ffffff"
+                                    )
+                                ]
+                            ),
+                            BoxComponent(
+                                layout='vertical',
+                                contents=[
+                                    TextComponent(
+                                        text="遊戲結束",
+                                        size="xl",
+                                        color="#ebebeb",
+                                        align="end"
+                                    )
+                                ]
+                            )
+                        ],
+                    )
                 ],
-                "position": "absolute",
-                "offsetBottom": "0px",
-                "offsetStart": "0px",
-                "offsetEnd": "0px",
-                "backgroundColor": "#00000099",
-                "paddingAll": "20px"
-              }
-            ],
-            "paddingAll": "0px"
-          }
-        }
-        """
-        message = FlexSendMessage(alt_text="hello", contents=json.loads(bubble_string))
+            ),
+        )
+        message = FlexSendMessage(alt_text="hello", contents=bubble)
         line_bot_api.reply_message(
             event.reply_token,
             message
