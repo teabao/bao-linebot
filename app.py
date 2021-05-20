@@ -559,6 +559,7 @@ def handle_content_message(event):
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
+        tempfile_path = tf.name
         filename = tf.name.split('/')[-1]
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
