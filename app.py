@@ -114,7 +114,7 @@ def handle_text_message(event):
             }
             opponent['opponent_id'] = myself['user_id']
 
-            url = request.url_root + '/static/grid.jpg'
+            url = request.url_root + '/static/grid.png'
             app.logger.info("url=" + url)
             line_bot_api.reply_message(
                 event.reply_token,
@@ -133,6 +133,7 @@ def handle_text_message(event):
             user[opponent['user_id']] = opponent
             user[opponent['user_id']]['is_gaming'] = True
             user[opponent['user_id']]['my_turn'] = False
+            user[opponent['user_id']]['img_backup'] = '/app/static/grid.png'
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
@@ -548,29 +549,62 @@ def handle_sticker_message(event):
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_content_message(event):
     id = event.source.user_id
+    opponent_id = user[id]['opponent_id']
+
     if not user[id]['is_gaming'] or not user[id]['my_turn']:
         print('No')
         print(user[id]['is_gaming'])
         print(user[id]['my_turn'])
         return
+    user[id]['my_turn'] = False
+    user[opponent_id]['my_turn'] = True
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
-        tempfile_path = tf.name
         filename = tf.name.split('/')[-1]
+        user[id]['img_backup'] = tf.name
+        print(user[id]['img_backup'])
+
+    # ! image diff check
+    img_new = cv2.imread(user[id]['img_backup'])
+    img_old = cv2.imread(user[opponent_id]['img_backup'])
+
+    # center of diff pixel
+    center = [0, 0]
+
+    pos = np.where(img_new != img_old)
+    num = len(pos[0])
+    for k in range(2):
+        for i in range(num):
+            center[k] += pos[k][i]
+        center[k] = center[k]/num
+
+    minimum_dis = float('inf')
+    minimum_i = 0
+    minimum_j = 0
+
+    for i in range(3):
+        for j in range(3):
+            x = i*100+50
+            y = j*100+50
+            dis = ((x-center[0])**2 + (y-center[1])**2) ** 0.5
+            if dis < minimum_dis:
+                minimum_dis = dis
+                minimum_i, minimum_j = i, j
+
+    print(minimum_i, minimum_j)
+
+    # ! end check
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    img = cv2.imread(tempfile_path)
-
     url = request.url_root + '/static/tmp/'+filename
-    print(url)
     app.logger.info("url=" + url)
 
-    line_bot_api.push_message(user[id]['opponent_id'], [
+    line_bot_api.push_message(opponent_id, [
         TextSendMessage(text='輪到你了'),
         ImageSendMessage(url, url)
     ])
