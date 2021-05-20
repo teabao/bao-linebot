@@ -549,6 +549,9 @@ def handle_sticker_message(event):
 def handle_content_message(event):
     id = event.source.user_id
     if not user[id]['is_gaming'] or not user[id]['my_turn']:
+        print('No')
+        print(user[id]['is_gaming'])
+        print(user[id]['my_turn'])
         return
 
     ext = 'jpg'
@@ -562,7 +565,10 @@ def handle_content_message(event):
 
     img = cv2.imread(tempfile_path)
 
+    url = request.url_root + '/static/grid.jpg'
+    print(url)
     url = tempfile_path
+    print(url)
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(user[id]['opponent_id'], [
