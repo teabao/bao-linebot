@@ -72,7 +72,9 @@ def make_static_tmp_dir():
 
 # ! user_information
 user_waiting = []
-user_gaming = []
+
+game_id = 0
+user_game_id = {}
 
 
 @app.route("/callback", methods=['POST'])
@@ -125,6 +127,10 @@ def handle_text_message(event):
 
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
             line_bot_api.push_message(opponent['user_id'], TextSendMessage(text='你配對到了'+myself['name']))
+            game_id += 1
+            user_game_id[myself['user_id']] = game_id
+            user_game_id[opponent['user_id']] = game_id
+            print(game_id)
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
