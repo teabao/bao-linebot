@@ -566,7 +566,6 @@ def handle_content_message(event):
             tf.write(chunk)
         filename = tf.name.split('/')[-1]
         user[id]['img_backup'] = tf.name
-        print(user[id]['img_backup'])
 
     # ! image diff check
     img_new = cv2.imread(user[id]['img_backup'])
@@ -599,7 +598,7 @@ def handle_content_message(event):
         for j in range(3):
             x = i*100+50
             y = j*100+50
-            dis = ((x-center[0])**2 + (y-center[1])**2)
+            dis = (x-center[0])**2 + (y-center[1])**2
             print(i, j, dis)
             if dis < minimum_dis:
                 minimum_dis = dis
@@ -611,7 +610,10 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
+    cv2.imwrite('/app/static/tmp/diff.jpg', pos)
+
     url = request.url_root + '/static/tmp/'+filename
+    url = request.url_root + '/static/tmp/diff.jpg'
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(opponent_id, [
