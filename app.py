@@ -101,11 +101,18 @@ def handle_text_message(event):
             # line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
 
         else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(
-                    text='配對中... (請點選確認以等待其他玩家)',
-                    quick_reply=QuickReply(items=[QuickReplyButton(action=PostbackAction(label="確認", data="confirm_wait"))])))
+            confirm_template = ConfirmTemplate(text='加入配對', actions=[
+                MessageAction(label='是', text='配對中...'),
+                MessageAction(label='否', text='取消配對'),
+            ])
+            template_message = TemplateSendMessage(alt_text='Confirm alt text', template=confirm_template)
+
+            if template_message == '配對中...':
+                user_waiting.append({
+                    'name': line_bot_api.get_profile(event.source.user_id).display_name,
+                    'user_id': event.source.user_id,
+                    'reply_token': event.reply_token
+                })
 
     elif text == 'pair':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
@@ -167,19 +174,6 @@ def handle_text_message(event):
                 TextSendMessage(text='success: ' + str(result.success)),
             ]
         )
-    elif text == 'bye':
-        if isinstance(event.source, SourceGroup):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_group(event.source.group_id)
-        elif isinstance(event.source, SourceRoom):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_room(event.source.room_id)
-        else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't leave from 1:1 chat"))
     elif text == 'image':
         url = request.url_root + '/static/logo.png'
         app.logger.info("url=" + url)
