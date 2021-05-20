@@ -73,8 +73,7 @@ def make_static_tmp_dir():
 # ! user_information
 user_waiting = []
 
-game_id = 0
-user_game_id = {}
+user = {}
 
 
 @app.route("/callback", methods=['POST'])
@@ -111,9 +110,9 @@ def handle_text_message(event):
             myself = {
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
                 'user_id': event.source.user_id,
+                'opponent_id': opponent['user_id']
             }
-            print('opponent : ' + str(opponent))
-            print('myself   : ' + str(myself))
+            opponent['opponent_id'] = myself['user_id']
 
             url = request.url_root + '/static/grid.jpg'
             app.logger.info("url=" + url)
@@ -125,20 +124,22 @@ def handle_text_message(event):
                 ]
             )
 
-            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
             line_bot_api.push_message(opponent['user_id'], TextSendMessage(text='你配對到了'+myself['name']))
-            game_id += 1
-            user_game_id[myself['user_id']] = game_id
-            user_game_id[opponent['user_id']] = game_id
-            print(game_id)
+
+            user[myself['user_id']] = myself
+            user[myself['is_gaming']] = True
+            user[myself['my_turn']] = True
+
+            user[opponent['user_id']] = opponent
+            user[opponent['is_gaming']] = True
+            user[opponent['my_turn']] = False
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
 
             user_waiting.append({
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                'user_id': event.source.user_id,
-                'reply_token': event.reply_token
+                'user_id': event.source.user_id
             })
 
     elif text == 'pair':
@@ -543,29 +544,30 @@ def handle_sticker_message(event):
     )
 
 
-# Other Message Type
-@handler.add(MessageEvent, message=(ImageMessage, VideoMessage, AudioMessage))
+# Image Message Type
+@handler.add(MessageEvent, message=ImageMessage)
 def handle_content_message(event):
-    if isinstance(event.message, ImageMessage):
-        ext = 'jpg'
-    else:
+    id = event.source.user_id
+    if not user[id]['is_gaming'] or not user[id]['my_turn']:
         return
 
+    ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
         tempfile_path = tf.name
 
-    img = cv2.imread(tf.name)
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    print(img)
-    print(img.shape)
+    img = cv2.imread(tempfile_path)
 
-    line_bot_api.reply_message(event.reply_token, [
-        TextSendMessage(text='okk'),
-        TextSendMessage(text=str(message_content)),
-        TextSendMessage(text=str(type(message_content)))
+    url = tempfile_path
+    app.logger.info("url=" + url)
+
+    line_bot_api.push_message(user[id]['opponent_id'], [
+        TextSendMessage(text='輪到你了'),
+        ImageSendMessage(url, url)
     ])
 
 
