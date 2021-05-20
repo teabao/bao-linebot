@@ -80,7 +80,7 @@ def win(event):
             "contents": [
               {
                 "type": "image",
-                "url": '"""+request.url_root + '/static/poster.jpg'+"""',
+                "url": """+'"'+request.url_root + '/static/poster.jpg'+'"'+""",
                 "position": "relative",
                 "size": "full",
                 "aspectMode": "cover",
