@@ -593,10 +593,10 @@ def handle_content_message(event):
 
     for i in range(3):
         for j in range(3):
-            if not user[id]['valid_grid'][i, j]:
+            if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 x = i*100+50
                 y = j*100+50
-                diff[x-45:x+45, y-45:y+45, :] = 0
+                diff[x-50:x+49, y-50:y+49, :] = 0
 
     pos = np.where(diff != 0)
     num = len(pos[0])
@@ -623,9 +623,51 @@ def handle_content_message(event):
 
     print(minimum_i, minimum_j)
     user[id]['valid_grid'][minimum_i, minimum_j] = False
-    user[opponent_id]['valid_grid'] = user[id]['valid_grid']
 
     # ! end check
+
+    is_end = False
+    for i in range(3):
+        if np.sum(user[id]['valid_grid'][i, :]) == 0:
+            is_end = True
+        if np.sum(user[id]['valid_grid'][:, i]) == 0:
+            is_end = True
+    if not user[id]['valid_grid'][0, 0] and not user[id]['valid_grid'][1, 1] and not user[id]['valid_grid'][2, 2]:
+        is_end = True
+    if not user[id]['valid_grid'][2, 0] and not user[id]['valid_grid'][1, 1] and not user[id]['valid_grid'][0, 2]:
+        is_end = True
+
+    if is_end:
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text='遊戲結束~'),
+            TextSendMessage(text='你贏了')
+        ])
+        line_bot_api.push_message(opponent_id, [
+            TextSendMessage(text='遊戲結束~'),
+            TextSendMessage(text='你輸了')
+        ])
+
+    count = 0
+    for i in range(3):
+        for j in range(3):
+            if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
+                count += 1
+    if count == 9 and not is_end:
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text='遊戲結束~'),
+            TextSendMessage(text='平手~')
+        ])
+        line_bot_api.push_message(opponent_id, [
+            TextSendMessage(text='遊戲結束~'),
+            TextSendMessage(text='平手~')
+        ])
+        is_end = True
+
+    if count == 9 or is_end:
+        user[id]['is_gaming'] = False
+        user[opponent_id]['is_gaming'] = False
+
+    #! ======
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
