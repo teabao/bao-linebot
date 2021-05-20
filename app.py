@@ -122,7 +122,7 @@ def handle_text_message(event):
             )
 
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
-            line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
+            line_bot_api.push_message(opponent['user_id'], TextSendMessage(text='你配對到了'+myself['name']))
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
@@ -549,15 +549,10 @@ def handle_content_message(event):
             tf.write(chunk)
         tempfile_path = tf.name
 
-    dist_path = tempfile_path + '.' + ext
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
+    print(message_content)
+    print(type(message_content))
 
-    line_bot_api.reply_message(
-        event.reply_token, [
-            TextSendMessage(text='Save content.'),
-            TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name))
-        ])
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='ok'))
 
 
 @handler.add(FollowEvent)
