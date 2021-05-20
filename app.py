@@ -22,7 +22,7 @@ import sys
 import tempfile
 from argparse import ArgumentParser
 
-import cv2 as cv
+import cv2
 import numpy as np
 from flask import Flask, abort, request, send_from_directory
 from linebot import LineBotApi, WebhookHandler
