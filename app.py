@@ -581,6 +581,12 @@ def handle_content_message(event):
     # center of diff pixel
     center = [0, 0]
 
+    diff = np.abs(img_new - img_old)
+    diff[85:115, :, :] = 0
+    diff[185:215, :, :] = 0
+    diff[:, 85:115, :] = 0
+    diff[:, 185:215, :] = 0
+
     pos = np.where(np.abs(img_new - img_old) > 128)
     num = len(pos[0])
     for k in range(2):
@@ -610,14 +616,16 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    cv2.imwrite('/app/static/tmp/diff.jpg', np.abs(img_new - img_old))
+    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    url2 = request.url_root + '/static/tmp/diff.jpg'
+    app.logger.info("url2=" + url2)
 
     url = request.url_root + '/static/tmp/'+filename
-    url = request.url_root + '/static/tmp/diff.jpg'
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(opponent_id, [
         TextSendMessage(text='輪到你了'),
+        ImageSendMessage(url2, url2),
         ImageSendMessage(url, url)
     ])
 
