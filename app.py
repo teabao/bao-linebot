@@ -70,7 +70,7 @@ def make_static_tmp_dir():
             raise
 
 
-def win(event, filename, txt):
+def end_msg(event, filename, txt):
     bubble_string = """
         {
           "type": "bubble",
@@ -131,10 +131,6 @@ def win(event, filename, txt):
         }
         """
     message = FlexSendMessage(alt_text="hello", contents=json.loads(bubble_string))
-    line_bot_api.reply_message(
-        event.reply_token,
-        message
-    )
 
 
 # ! user_information
@@ -218,12 +214,6 @@ def handle_text_message(event):
                 TextSendMessage(text='total usage: ' + str(quota_consumption.total_usage)),
             ]
         )
-    elif text == 'f':
-        win(event, 'win.png', '你贏了')
-    elif text == 'g':
-        win(event, 'cat.jpg', '你輸了')
-    elif text == 'h':
-        win(event, 'hand.jpg', '平手')
     else:
         bubble = BubbleContainer(
             direction='ltr',
@@ -376,14 +366,8 @@ def handle_content_message(event):
         is_end = True
 
     if is_end:
-        line_bot_api.reply_message(event.reply_token, [
-            TextSendMessage(text='遊戲結束~'),
-            TextSendMessage(text='你贏了')
-        ])
-        line_bot_api.push_message(opponent_id, [
-            TextSendMessage(text='遊戲結束~'),
-            TextSendMessage(text='你輸了')
-        ])
+        line_bot_api.reply_message(event.reply_token, end_msg(event, 'win.png', '你贏了'))
+        line_bot_api.push_message(opponent_id, end_msg(event, 'cat.jpg', '你輸了'))
 
     count = 0
     for i in range(3):
@@ -391,14 +375,8 @@ def handle_content_message(event):
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 count += 1
     if count == 9 and not is_end:
-        line_bot_api.reply_message(event.reply_token, [
-            TextSendMessage(text='遊戲結束~'),
-            TextSendMessage(text='平手~')
-        ])
-        line_bot_api.push_message(opponent_id, [
-            TextSendMessage(text='遊戲結束~'),
-            TextSendMessage(text='平手~')
-        ])
+        line_bot_api.reply_message(event.reply_token, end_msg(event, 'hand.jpg', '平手'))
+        line_bot_api.push_message(opponent_id, end_msg(event, 'hand.jpg', '平手'))
         is_end = True
 
     if count == 9 or is_end:
