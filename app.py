@@ -55,6 +55,9 @@ handler = WebhookHandler(channel_secret)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
+# ! user_information
+user_waiting = []
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -86,6 +89,23 @@ def handle_text_message(event):
     if text == '配對':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='配對中...'))
+
+        if user_waiting:
+            opponent = user_waiting.pop(0)
+            myself = {
+                'name': line_bot_api.get_profile(event.source.user_id).display_name,
+                'reply_token': event.reply_token
+            }
+
+            line_bot_api.reply_message(myself['reply_token'], TextSendMessage(text='你配對到了'+opponent['name']))
+            line_bot_api.reply_message(opponent['reply_token'], TextSendMessage(text='你配對到了'+myself['name']))
+
+        else:
+            user_waiting.append({
+                'name': line_bot_api.get_profile(event.source.user_id).display_name,
+                'reply_token': event.reply_token
+            })
+
     elif text == 'profile':
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
