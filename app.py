@@ -22,6 +22,8 @@ import sys
 import tempfile
 from argparse import ArgumentParser
 
+import cv2
+import numpy as np
 from flask import Flask, abort, request, send_from_directory
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
@@ -544,12 +546,15 @@ def handle_content_message(event):
         return
 
     message_content = line_bot_api.get_message_content(event.message.id)
-    print(message_content)
-    print(type(message_content))
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
         tempfile_path = tf.name
+
+    img = cv2.imread(tf.name)
+
+    print(img)
+    print(img.shape)
 
     line_bot_api.reply_message(event.reply_token, [
         TextSendMessage(text='okk'),
