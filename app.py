@@ -105,7 +105,7 @@ def handle_text_message(event):
                 event.reply_token,
                 TextSendMessage(
                     text='配對中... (請點選確認以等待其他玩家)',
-                    quick_reply=QuickReply(items=[QuickReplyButton(action=PostbackAction(label="confirm_wait", data="確認"))])))
+                    quick_reply=QuickReply(items=[QuickReplyButton(action=PostbackAction(label="確認", data="confirm_wait"))])))
 
     elif text == 'pair':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
