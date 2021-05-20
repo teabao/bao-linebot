@@ -96,6 +96,7 @@ def handle_text_message(event):
                 'reply_token': event.reply_token
             }
             print('opponent : ' + str(opponent))
+            print('myself   : ' + str(myself))
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
             line_bot_api.reply_message(opponent['reply_token'], TextSendMessage(text='你配對到了'+myself['name']))
 
