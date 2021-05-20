@@ -610,7 +610,7 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    cv2.imwrite('/app/static/tmp/diff.jpg', pos)
+    cv2.imwrite('/app/static/tmp/diff.jpg', np.abs(img_new - img_old))
 
     url = request.url_root + '/static/tmp/'+filename
     url = request.url_root + '/static/tmp/diff.jpg'
