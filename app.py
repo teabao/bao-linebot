@@ -114,7 +114,7 @@ def handle_text_message(event):
             }
             opponent['opponent_id'] = myself['user_id']
 
-            url = request.url_root + '/static/grid.png'
+            url = request.url_root + '/static/grid.jpg'
             app.logger.info("url=" + url)
             line_bot_api.reply_message(
                 event.reply_token,
@@ -133,7 +133,7 @@ def handle_text_message(event):
             user[opponent['user_id']] = opponent
             user[opponent['user_id']]['is_gaming'] = True
             user[opponent['user_id']]['my_turn'] = False
-            user[opponent['user_id']]['img_backup'] = '/app/static/grid.png'
+            user[opponent['user_id']]['img_backup'] = '/app/static/grid.jpg'
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
@@ -559,7 +559,7 @@ def handle_content_message(event):
     user[id]['my_turn'] = False
     user[opponent_id]['my_turn'] = True
 
-    ext = 'png'
+    ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
         for chunk in message_content.iter_content():
@@ -582,7 +582,7 @@ def handle_content_message(event):
     # center of diff pixel
     center = [0, 0]
 
-    pos = np.where(np.abs(img_new - img_old) > 40)
+    pos = np.where(np.abs(img_new - img_old) > 128)
     num = len(pos[0])
     for k in range(2):
         for i in range(num):
