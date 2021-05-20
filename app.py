@@ -144,7 +144,6 @@ def handle_text_message(event):
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
                 'user_id': event.source.user_id
             })
-
     elif text == 'qc':
         quota_consumption = line_bot_api.get_message_quota_consumption()
         line_bot_api.reply_message(
@@ -159,7 +158,7 @@ def handle_text_message(event):
                 paddingAll="0px",
                 contents=[
                     ImageComponent(
-                        url=request.url_root + '/static/win.jpg',
+                        url=request.url_root + '/static/win.png',
                         position="relative",
                         size="full",
                         aspectMode="cover",
