@@ -92,19 +92,20 @@ def handle_text_message(event):
             opponent = user_waiting.pop(0)
             myself = {
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                'user_id': event.source.user_id
+                'user_id': event.source.user_id,
             }
             print('opponent : ' + str(opponent))
             print('myself   : ' + str(myself))
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
-            line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
+            line_bot_api.reply_message(opponent['reply_token'], TextSendMessage(text='你配對到了'+myself['name']))
+            # line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
 
         else:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
-            user_waiting.append({
-                'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                'user_id': event.source.user_id
-            })
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(
+                    text='配對中... (請點選確認以等待其他玩家)',
+                    quick_reply=QuickReply(items=[QuickReplyButton(action=PostbackAction(label="confirm_wait", data="確認"))])))
 
     elif text == 'pair':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
@@ -587,6 +588,12 @@ def handle_postback(event):
     elif event.postback.data == 'date_postback':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=event.postback.params['date']))
+    elif event.postback.data == 'confirm_wait':
+        user_waiting.append({
+            'name': line_bot_api.get_profile(event.source.user_id).display_name,
+            'user_id': event.source.user_id,
+            'reply_token': event.reply_token
+        })
 
 
 @app.route('/static/<path:path>')
