@@ -106,8 +106,10 @@ def handle_text_message(event):
                 MessageAction(label='否', text='取消配對'),
             ])
             template_message = TemplateSendMessage(alt_text='Confirm alt text', template=confirm_template)
-
-            if template_message == '配對中...':
+            print(confirm_template)
+            print('================')
+            print(template_message)
+            if 'template_message' == '配對中...':
                 user_waiting.append({
                     'name': line_bot_api.get_profile(event.source.user_id).display_name,
                     'user_id': event.source.user_id,
