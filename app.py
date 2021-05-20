@@ -574,6 +574,11 @@ def handle_content_message(event):
     img_old = cv2.imread(user[opponent_id]['img_backup'])
     img_old = cv2.resize(img_old, (300, 300), interpolation=cv2.INTER_AREA)
 
+    print('img_backup')
+    print(user[id]['img_backup'])
+    print(user[opponent_id]['img_backup'])
+    print(img_new.shape)
+    print(img_old.shape)
     # center of diff pixel
     center = [0, 0]
 
@@ -584,6 +589,8 @@ def handle_content_message(event):
             center[k] += pos[k][i]
         center[k] = center[k]/num
 
+    print("center"+center)
+
     minimum_dis = float('inf')
     minimum_i = 0
     minimum_j = 0
@@ -592,7 +599,7 @@ def handle_content_message(event):
         for j in range(3):
             x = i*100+50
             y = j*100+50
-            dis = ((x-center[0])**2 + (y-center[1])**2) ** 0.5
+            dis = ((x-center[0])**2 + (y-center[1])**2)
             if dis < minimum_dis:
                 minimum_dis = dis
                 minimum_i, minimum_j = i, j
