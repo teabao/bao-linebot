@@ -101,7 +101,10 @@ def handle_text_message(event):
             app.logger.info("url=" + url)
             line_bot_api.reply_message(
                 event.reply_token,
-                ImageSendMessage(url, url)
+                [
+                    TextSendMessage(text='你配對到了'+opponent['name']),
+                    ImageSendMessage(url, url)
+                ]
             )
 
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
