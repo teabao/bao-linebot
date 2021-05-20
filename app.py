@@ -55,8 +55,22 @@ handler = WebhookHandler(channel_secret)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
+# function for create tmp dir for download content
+
+
+def make_static_tmp_dir():
+    try:
+        os.makedirs(static_tmp_path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
+            pass
+        else:
+            raise
+
+
 # ! user_information
 user_waiting = []
+user_gaming = []
 
 
 @app.route("/callback", methods=['POST'])
@@ -97,7 +111,7 @@ def handle_text_message(event):
             print('opponent : ' + str(opponent))
             print('myself   : ' + str(myself))
 
-            url = request.url_root + '/static/grid.png'
+            url = request.url_root + '/static/grid.jpg'
             app.logger.info("url=" + url)
             line_bot_api.reply_message(
                 event.reply_token,
@@ -526,10 +540,6 @@ def handle_sticker_message(event):
 def handle_content_message(event):
     if isinstance(event.message, ImageMessage):
         ext = 'jpg'
-    elif isinstance(event.message, VideoMessage):
-        ext = 'mp4'
-    elif isinstance(event.message, AudioMessage):
-        ext = 'm4a'
     else:
         return
 
@@ -546,25 +556,6 @@ def handle_content_message(event):
     line_bot_api.reply_message(
         event.reply_token, [
             TextSendMessage(text='Save content.'),
-            TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name))
-        ])
-
-
-@handler.add(MessageEvent, message=FileMessage)
-def handle_file_message(event):
-    message_content = line_bot_api.get_message_content(event.message.id)
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix='file-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tempfile_path = tf.name
-
-    dist_path = tempfile_path + '-' + event.message.file_name
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
-
-    line_bot_api.reply_message(
-        event.reply_token, [
-            TextSendMessage(text='Save file.'),
             TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name))
         ])
 
@@ -601,5 +592,6 @@ def send_static_content(path):
 
 
 if __name__ == "__main__":
+    make_static_tmp_dir()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
