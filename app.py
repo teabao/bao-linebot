@@ -598,7 +598,7 @@ def handle_content_message(event):
                 y = j*100+50
                 diff[x-45:x+45, y-45:y+45, :] = 0
 
-    pos = np.where(np.abs(img_new - img_old) > 128)
+    pos = np.where(diff != 0)
     num = len(pos[0])
     for k in range(2):
         for i in range(num):
