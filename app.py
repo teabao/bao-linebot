@@ -83,7 +83,10 @@ def callback():
 def handle_text_message(event):
     text = event.message.text
 
-    if text == 'profile':
+    if text == '配對':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='配對中...'))
+    elif text == 'profile':
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
             line_bot_api.reply_message(
