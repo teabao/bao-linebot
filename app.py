@@ -256,72 +256,23 @@ def handle_text_message(event):
                 url=request.url_root + '/static/poster.jpg',
                 size='full',
                 aspect_ratio='20:13',
-                aspect_mode='cover',
-                action=URIAction(uri='http://example.com', label='label')
+                aspect_mode='cover'
             ),
             body=BoxComponent(
                 layout='vertical',
                 contents=[
-                    # title
-                    TextComponent(text='Brown Cafe', weight='bold', size='xl'),
-                    # review
-                    BoxComponent(
-                        layout='baseline',
-                        margin='md',
-                        contents=[
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            TextComponent(text='4.0', size='sm', color='#999999', margin='md',
-                                          flex=0)
-                        ]
-                    ),
-                    # info
+                    TextComponent(text='Tic Tac Toe', weight='bold', size='xl'),
                     BoxComponent(
                         layout='vertical',
                         margin='lg',
                         spacing='sm',
                         contents=[
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Place',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text='Shinjuku, Tokyo',
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5
-                                    )
-                                ],
-                            ),
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Time',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text="10:00 - 23:00",
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5,
-                                    ),
-                                ],
-                            ),
+                            TextComponent(
+                                text='在線上隨機配對玩家，挑戰你的對手！',
+                                color='#aaaaaa',
+                                size='sm',
+                                flex=1
+                            )
                         ],
                     )
                 ],
@@ -330,19 +281,16 @@ def handle_text_message(event):
                 layout='vertical',
                 spacing='sm',
                 contents=[
-                    # callAction
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='CALL', uri='tel:000000'),
+                        action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
                     ),
-                    # separator
                     SeparatorComponent(),
-                    # websiteAction
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://example.com")
+                        action=MessageAction(label='尋找配對', text='配對')
                     )
                 ]
             ),
@@ -383,46 +331,6 @@ def handle_text_message(event):
                         "weight": "bold",
                         "size": "xl",
                         "color": "#ffffff"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "baseline",
-                        "margin": "md",
-                        "contents": [
-                          {
-                            "type": "icon",
-                            "size": "sm",
-                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                          },
-                          {
-                            "type": "icon",
-                            "size": "sm",
-                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                          },
-                          {
-                            "type": "icon",
-                            "size": "sm",
-                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                          },
-                          {
-                            "type": "icon",
-                            "size": "sm",
-                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                          },
-                          {
-                            "type": "icon",
-                            "size": "sm",
-                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                          },
-                          {
-                            "type": "text",
-                            "text": "4.0",
-                            "size": "sm",
-                            "color": "#d6d6d6",
-                            "margin": "md",
-                            "flex": 0
-                          }
-                        ]
                       }
                     ]
                   },
