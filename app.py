@@ -70,7 +70,7 @@ def make_static_tmp_dir():
             raise
 
 
-def win(event):
+def win(event, filename, txt):
     bubble_string = """
         {
           "type": "bubble",
@@ -80,7 +80,7 @@ def win(event):
             "contents": [
               {
                 "type": "image",
-                "url": """+'"'+request.url_root + '/static/poster.jpg'+'"'+""",
+                "url": """+'"'+request.url_root + '/static/'+filename+'"'+""",
                 "position": "relative",
                 "size": "full",
                 "aspectMode": "cover",
@@ -97,7 +97,7 @@ def win(event):
                     "contents": [
                       {
                         "type": "text",
-                        "text": "Brown Hotel",
+                        "text": "遊戲結束",
                         "weight": "bold",
                         "size": "xl",
                         "color": "#ffffff"
@@ -110,7 +110,7 @@ def win(event):
                     "contents": [
                       {
                         "type": "text",
-                        "text": "¥42,000",
+                        "text": """+'"'+txt+'"'+""",
                         "color": "#ebebeb",
                         "size": "xl",
                         "align": "end"
@@ -219,7 +219,11 @@ def handle_text_message(event):
             ]
         )
     elif text == 'f':
-        win(event)
+        win(event, 'win.png', '你贏了')
+    elif text == 'g':
+        win(event, 'cat.jpg', '你輸了')
+    elif text == 'h':
+        win(event, 'hand.jpg', '平手')
     else:
         bubble = BubbleContainer(
             direction='ltr',
