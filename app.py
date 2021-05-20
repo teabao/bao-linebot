@@ -558,8 +558,6 @@ def handle_content_message(event):
         print(user[id]['is_gaming'])
         print(user[id]['my_turn'])
         return
-    user[id]['my_turn'] = False
-    user[opponent_id]['my_turn'] = True
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -600,6 +598,13 @@ def handle_content_message(event):
 
     pos = np.where(diff != 0)
     num = len(pos[0])
+
+    if num == 0:
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text='你畫的位置有點奇怪喔~'),
+            TextSendMessage(text='請重傳~')
+        ])
+
     for k in range(2):
         for i in range(num):
             center[k] += pos[k][i]
@@ -679,10 +684,14 @@ def handle_content_message(event):
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(opponent_id, [
-        TextSendMessage(text='輪到你了'),
+
         ImageSendMessage(url2, url2),
-        ImageSendMessage(url, url)
+        ImageSendMessage(url, url),
+        TextSendMessage(text='輪到你了')
     ])
+
+    user[id]['my_turn'] = False
+    user[opponent_id]['my_turn'] = True
 
 
 @ handler.add(FollowEvent)
