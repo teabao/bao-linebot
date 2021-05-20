@@ -220,17 +220,7 @@ def handle_text_message(event):
         template_message = TemplateSendMessage(
             alt_text='Confirm alt text', template=confirm_template)
         line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'buttons':
-        buttons_template = ButtonsTemplate(
-            title='My buttons sample', text='Hello, my buttons', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping'),
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
+
     elif text == 'carousel':
         carousel_template = CarouselTemplate(columns=[
             CarouselColumn(text='hoge1', title='fuga1', actions=[
@@ -263,7 +253,7 @@ def handle_text_message(event):
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
-                url='https://example.com/cafe.jpg',
+                url=request.url_root + '/static/poster.jpg',
                 size='full',
                 aspect_ratio='20:13',
                 aspect_mode='cover',
@@ -522,8 +512,14 @@ def handle_text_message(event):
                         ),
                     ])))
     else:
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.message.text))
+        buttons_template = ButtonsTemplate(
+            title='My buttons sample', text='Hello, my buttons', actions=[
+                URIAction(label='Github', uri='https://github.com/teabao/bao-linebot'),
+                MessageAction(label='尋找配對', text='配對')
+            ])
+        template_message = TemplateSendMessage(
+            alt_text='Buttons alt text', template=buttons_template)
+        line_bot_api.reply_message(event.reply_token, template_message)
 
 
 @handler.add(MessageEvent, message=LocationMessage)
@@ -553,11 +549,15 @@ def handle_content_message(event):
     id = event.source.user_id
     opponent_id = user[id]['opponent_id']
 
-    if not user[id]['is_gaming'] or not user[id]['my_turn']:
-        print('No')
-        print(user[id]['is_gaming'])
-        print(user[id]['my_turn'])
+    if not user[id]['is_gaming']:
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text='目前還沒有配對~')
+        ])
         return
+    elif not user[id]['my_turn']:
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text='還沒有輪到你哦~')
+        ])
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -676,16 +676,16 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
-    url2 = request.url_root + '/static/tmp/diff.jpg'
-    app.logger.info("url2=" + url2)
+    # cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    # url2 = request.url_root + '/static/tmp/diff.jpg'
+    # app.logger.info("url2=" + url2)
 
     url = request.url_root + '/static/tmp/'+filename
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(opponent_id, [
 
-        ImageSendMessage(url2, url2),
+        # ImageSendMessage(url2, url2),
         ImageSendMessage(url, url),
         TextSendMessage(text='輪到你了')
     ])
