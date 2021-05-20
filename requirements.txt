@@ -1,3 +1,5 @@
 line-bot-sdk
 flask
+opencv-python
+numpy
 werkzeug>=0.15.4
