@@ -87,8 +87,7 @@ def handle_text_message(event):
     text = event.message.text.strip()
 
     if text == '配對':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text='配對中...'))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
 
         if user_waiting:
             opponent = user_waiting.pop(0)
@@ -105,6 +104,9 @@ def handle_text_message(event):
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
                 'reply_token': event.reply_token
             })
+
+    elif text == 'pair':
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
 
     elif text == 'profile':
         if isinstance(event.source, SourceUser):
