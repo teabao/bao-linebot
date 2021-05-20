@@ -552,7 +552,11 @@ def handle_content_message(event):
     print(message_content)
     print(type(message_content))
 
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='ok'))
+    line_bot_api.reply_message(event.reply_token, [
+        TextSendMessage(text='ok'),
+        TextSendMessage(text=str(message_content)),
+        TextSendMessage(text=str(type(message_content)))
+    ])
 
 
 @handler.add(FollowEvent)
