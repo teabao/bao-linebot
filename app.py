@@ -87,23 +87,23 @@ def handle_text_message(event):
     text = event.message.text.strip()
 
     if text == '配對':
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
 
         if user_waiting:
             opponent = user_waiting.pop(0)
             myself = {
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                'reply_token': event.reply_token
+                'user_id': event.source.user_id
             }
             print('opponent : ' + str(opponent))
             print('myself   : ' + str(myself))
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
-            line_bot_api.reply_message(opponent['reply_token'], TextSendMessage(text='你配對到了'+myself['name']))
+            line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
 
         else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
             user_waiting.append({
                 'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                'reply_token': event.reply_token
+                'user_id': event.source.user_id
             })
 
     elif text == 'pair':
