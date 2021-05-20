@@ -582,7 +582,7 @@ def handle_content_message(event):
     # center of diff pixel
     center = [0, 0]
 
-    pos = np.where(img_new != img_old)
+    pos = np.where(np.absolute(img_new - img_old) > 40)
     num = len(pos[0])
     for k in range(2):
         for i in range(num):
