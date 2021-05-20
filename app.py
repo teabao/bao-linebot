@@ -96,26 +96,24 @@ def handle_text_message(event):
             }
             print('opponent : ' + str(opponent))
             print('myself   : ' + str(myself))
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
-            line_bot_api.reply_message(opponent['reply_token'], TextSendMessage(text='你配對到了'+myself['name']))
-            # line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
+
+            app.logger.info("url=" + request.url_root + '/static/grid.jpg')
+            line_bot_api.reply_message(
+                event.reply_token,
+                ImageSendMessage(url, url)
+            )
+
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='你配對到了'+opponent['name']))
+            line_bot_api.push_message(opponent['user_id'], [TextSendMessage(text='你配對到了'+myself['name']), ])
 
         else:
-            confirm_template = ConfirmTemplate(text='加入配對', actions=[
-                MessageAction(label='是', text='配對中...'),
-                MessageAction(label='否', text='取消配對'),
-            ])
-            template_message = TemplateSendMessage(alt_text='Confirm alt text', template=confirm_template)
-            # print(confirm_template)
-            # print('================')
-            # print(template_message)
-            if confirm_template.text == '配對中...':
-                user_waiting.append({
-                    'name': line_bot_api.get_profile(event.source.user_id).display_name,
-                    'user_id': event.source.user_id,
-                    'reply_token': event.reply_token
-                })
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=confirm_template.text))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
+
+            user_waiting.append({
+                'name': line_bot_api.get_profile(event.source.user_id).display_name,
+                'user_id': event.source.user_id,
+                'reply_token': event.reply_token
+            })
 
     elif text == 'pair':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(user_waiting)))
@@ -133,7 +131,7 @@ def handle_text_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="Bot can't use profile API without user ID"))
-    elif text == 'quota':
+    elif text == 'q':
         quota = line_bot_api.get_message_quota()
         line_bot_api.reply_message(
             event.reply_token, [
@@ -141,7 +139,7 @@ def handle_text_message(event):
                 TextSendMessage(text='value: ' + str(quota.value))
             ]
         )
-    elif text == 'quota_consumption':
+    elif text == 'qc':
         quota_consumption = line_bot_api.get_message_quota_consumption()
         line_bot_api.reply_message(
             event.reply_token, [
@@ -571,7 +569,7 @@ def handle_file_message(event):
 def handle_follow(event):
     app.logger.info("Got Follow event:" + event.source.user_id)
     line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text='歡迎趴波'))
+        event.reply_token, TextSendMessage(text='歡迎加入'))
 
 
 @handler.add(PostbackEvent)
