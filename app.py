@@ -131,6 +131,7 @@ def end_msg(event, filename, txt):
         }
         """
     message = FlexSendMessage(alt_text="hello", contents=json.loads(bubble_string))
+    return message
 
 
 # ! user_information
