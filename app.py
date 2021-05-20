@@ -134,6 +134,7 @@ def handle_text_message(event):
             user[opponent['user_id']]['is_gaming'] = True
             user[opponent['user_id']]['my_turn'] = False
             user[opponent['user_id']]['img_backup'] = '/app/static/grid.jpg'
+            user[opponent['user_id']]['valid_grid'] = np.ones(shape=(3, 3), dtype=bool)
 
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
@@ -578,14 +579,23 @@ def handle_content_message(event):
     print(user[opponent_id]['img_backup'])
     print(img_new.shape)
     print(img_old.shape)
+
     # center of diff pixel
     center = [0, 0]
 
+    # ! cut grid and none valid grid
     diff = np.abs(img_new - img_old)
     diff[85:115, :, :] = 0
     diff[185:215, :, :] = 0
     diff[:, 85:115, :] = 0
     diff[:, 185:215, :] = 0
+
+    for i in range(3):
+        for j in range(3):
+            if not user[id]['valid_grid'][i, j]:
+                x = i*100+50
+                y = j*100+50
+                diff[x-45:x+45, y-45:y+45, :] = 0
 
     pos = np.where(np.abs(img_new - img_old) > 128)
     num = len(pos[0])
@@ -611,6 +621,8 @@ def handle_content_message(event):
                 minimum_i, minimum_j = i, j
 
     print(minimum_i, minimum_j)
+    user[id]['valid_grid'][minimum_i, minimum_j] = False
+    user[opponent_id]['valid_grid'] = user[id]['valid_grid']
 
     # ! end check
 
@@ -630,14 +642,14 @@ def handle_content_message(event):
     ])
 
 
-@handler.add(FollowEvent)
+@ handler.add(FollowEvent)
 def handle_follow(event):
     app.logger.info("Got Follow event:" + event.source.user_id)
     line_bot_api.reply_message(
         event.reply_token, TextSendMessage(text='歡迎加入'))
 
 
-@handler.add(PostbackEvent)
+@ handler.add(PostbackEvent)
 def handle_postback(event):
     if event.postback.data == 'ping':
         line_bot_api.reply_message(
@@ -656,7 +668,7 @@ def handle_postback(event):
         })
 
 
-@app.route('/static/<path:path>')
+@ app.route('/static/<path:path>')
 def send_static_content(path):
     return send_from_directory('static', path)
 
