@@ -552,7 +552,7 @@ def handle_content_message(event):
         tempfile_path = tf.name
 
     line_bot_api.reply_message(event.reply_token, [
-        TextSendMessage(text='ok'),
+        TextSendMessage(text='okk'),
         TextSendMessage(text=str(message_content)),
         TextSendMessage(text=str(type(message_content)))
     ])
