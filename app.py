@@ -570,7 +570,9 @@ def handle_content_message(event):
 
     # ! image diff check
     img_new = cv2.imread(user[id]['img_backup'])
+    img_new = cv2.resize(img_new, (300, 300), interpolation=cv2.INTER_AREA)
     img_old = cv2.imread(user[opponent_id]['img_backup'])
+    img_old = cv2.resize(img_old, (300, 300), interpolation=cv2.INTER_AREA)
 
     # center of diff pixel
     center = [0, 0]
