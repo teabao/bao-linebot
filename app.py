@@ -129,6 +129,7 @@ def handle_text_message(event):
             user[myself['user_id']] = myself
             user[myself['user_id']]['is_gaming'] = True
             user[myself['user_id']]['my_turn'] = True
+            user[myself['user_id']]['valid_grid'] = np.ones(shape=(3, 3), dtype=bool)
 
             user[opponent['user_id']] = opponent
             user[opponent['user_id']]['is_gaming'] = True
