@@ -97,7 +97,7 @@ def handle_text_message(event):
             print('opponent : ' + str(opponent))
             print('myself   : ' + str(myself))
 
-            url = request.url_root + '/static/grid.jpg'
+            url = request.url_root + '/static/grid.png'
             app.logger.info("url=" + url)
             line_bot_api.reply_message(
                 event.reply_token,
