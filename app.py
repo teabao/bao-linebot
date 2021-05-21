@@ -422,56 +422,7 @@ def handle_content_message(event):
 @ handler.add(FollowEvent)
 def handle_follow(event):
     app.logger.info("Got Follow event:" + event.source.user_id)
-    bubble = BubbleContainer(
-        direction='ltr',
-        hero=ImageComponent(
-            url=request.url_root + '/static/poster.jpg',
-            size='full',
-            aspect_ratio='20:13',
-            aspect_mode='cover'
-        ),
-        body=BoxComponent(
-            layout='vertical',
-            contents=[
-                TextComponent(text='Tic Tac Toe (井字遊戲)', weight='bold', size='xl'),
-                BoxComponent(
-                    layout='vertical',
-                    margin='lg',
-                    spacing='sm',
-                    contents=[
-                        TextComponent(
-                            text='在線上隨機配對玩家，挑戰你的對手！',
-                            color='#aaaaaa',
-                            size='sm',
-                            flex=1
-                        )
-                    ],
-                )
-            ],
-        ),
-        footer=BoxComponent(
-            layout='vertical',
-            spacing='sm',
-            contents=[
-                ButtonComponent(
-                    style='link',
-                    height='sm',
-                    action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
-                ),
-                SeparatorComponent(),
-                ButtonComponent(
-                    style='link',
-                    height='sm',
-                    action=MessageAction(label='尋找配對', text='配對')
-                )
-            ]
-        ),
-    )
-    message = FlexSendMessage(alt_text="hello", contents=bubble)
-    line_bot_api.reply_message(
-        event.reply_token,
-        message
-    )
+    line_bot_api.reply_message(event.reply_token, intro_msg())
 
 
 @ app.route('/static/<path:path>')
