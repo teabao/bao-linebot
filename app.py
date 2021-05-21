@@ -279,17 +279,14 @@ def handle_text_message(event):
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_content_message(event):
     id = event.source.user_id
-    # opponent_id = user[id]['opponent_id']
+    opponent_id = user[id]['opponent_id']
 
-    # if not user[id]['is_gaming']:
-    #     line_bot_api.reply_message(event.reply_token, [
-    #         TextSendMessage(text='目前還沒有配對~')
-    #     ])
-    #     return
-    # elif not user[id]['my_turn']:
-    #     line_bot_api.reply_message(event.reply_token, [
-    #         TextSendMessage(text='還沒有輪到你哦~')
-    #     ])
+    if not user[id]['is_gaming']:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前還沒有配對~'))
+        return
+    elif not user[id]['my_turn']:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='還沒有輪到你哦~'))
+        return
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -305,8 +302,7 @@ def handle_content_message(event):
     # ! image diff check
     img_new = cv2.imread(user[id]['img_backup'])
     img_new = cv2.resize(img_new, (300, 300), interpolation=cv2.INTER_AREA)
-    # img_old = cv2.imread(user[opponent_id]['img_backup'])
-    img_old = cv2.imread('/app/static/grid.jpg')
+    img_old = cv2.imread(user[opponent_id]['img_backup'])
     img_old = cv2.resize(img_old, (300, 300), interpolation=cv2.INTER_AREA)
 
     # center of diff pixel
@@ -348,11 +344,13 @@ def handle_content_message(event):
             ImageSendMessage(url2, url2)
         ])
         return
+    # ! debug
     line_bot_api.reply_message(event.reply_token, [
         TextSendMessage(text='沒問題~'),
         ImageSendMessage(url2, url2)
     ])
     return
+    # ! ==
 
     for k in range(2):
         for i in range(num):
