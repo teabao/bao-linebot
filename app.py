@@ -320,17 +320,20 @@ def handle_content_message(event):
     diff[:, 85:115, :] = 0
     diff[:, 185:215, :] = 0
 
+    count_non_zero = 0
     for i in range(3):
         for j in range(3):
+            x = i*100+50
+            y = j*100+50
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
-                x = i*100+50
-                y = j*100+50
                 diff[x-50:x+49, y-50:y+49, :] = 0
+            if len(np.where(diff[x-50:x+49, y-50:y+49, :])) > 0:
+                count_non_zero += 1
 
     pos = np.where(diff != 0)
     num = len(pos[0])
 
-    if num == 0:
+    if num == 0 or count_non_zero > 1 or count_non_zero == 0:
         line_bot_api.reply_message(event.reply_token, [
             TextSendMessage(text='你畫的位置有點奇怪喔~'),
             TextSendMessage(text='請重傳~')
