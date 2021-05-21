@@ -333,15 +333,14 @@ def handle_content_message(event):
     pos = np.where(diff != 0)
     num = len(pos[0])
 
-    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
-    url2 = request.url_root + '/static/tmp/diff.jpg'
-    app.logger.info("url2=" + url2)
+    # cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    # url2 = request.url_root + '/static/tmp/diff.jpg'
+    # app.logger.info("url2=" + url2)
 
     if num == 0 or count_non_zero > 1 or count_non_zero == 0:
         line_bot_api.reply_message(event.reply_token, [
             TextSendMessage(text='你畫的位置或顏色有點奇怪喔~'),
-            TextSendMessage(text='請重傳~'),
-            ImageSendMessage(url2, url2)
+            TextSendMessage(text='請重傳~')
         ])
         return
 
