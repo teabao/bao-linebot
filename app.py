@@ -328,8 +328,8 @@ def handle_content_message(event):
             y = j*100+50
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 diff[x-50:x+49, y-50:y+49, :] = 0
-            if len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)[0]) > 0:
-                print(i, j, ' : non-zero,   len:', len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)[0]))
+            if len(np.where(diff[x-50:x+49, y-50:y+49, :] > 100)[0]) > 0:
+                print(i, j, ' : non-zero,   len:', len(np.where(diff[x-50:x+49, y-50:y+49, :] > 100)[0]))
                 count_non_zero += 1
 
     pos = np.where(diff != 0)
