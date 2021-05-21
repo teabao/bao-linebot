@@ -326,7 +326,7 @@ def handle_content_message(event):
                 diff[x-50:x+49, y-50:y+49, :] = 0
             sub_img = diff[x-50:x+49, y-50:y+49, :]
             non_zero = len(np.where(sub_img > 100)[0])
-            if non_zero > 0:
+            if non_zero > 800:
                 print(i, j, ' : non-zero,   len:', non_zero)
                 count_non_zero += 1
 
@@ -344,13 +344,6 @@ def handle_content_message(event):
             ImageSendMessage(url2, url2)
         ])
         return
-    # ! debug
-    line_bot_api.reply_message(event.reply_token, [
-        TextSendMessage(text='沒問題~'),
-        ImageSendMessage(url2, url2)
-    ])
-    return
-    # ! ==
 
     for k in range(2):
         for i in range(num):
