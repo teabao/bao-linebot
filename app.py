@@ -169,7 +169,7 @@ def handle_text_message(event):
 
     if text == '配對':
 
-        if user_waiting and user_waiting[0]['user_id'] != line_bot_api.get_profile(event.source.user_id).display_name:
+        if user_waiting and user_waiting[0]['user_id'] == line_bot_api.get_profile(event.source.user_id).display_name:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='配對中...'))
 
         elif user_waiting:
@@ -187,7 +187,8 @@ def handle_text_message(event):
                 event.reply_token,
                 [
                     TextSendMessage(text='你配對到了'+opponent['name']),
-                    ImageSendMessage(url, url)
+                    ImageSendMessage(url, url),
+                    TextSendMessage(text='在圖片上畫圈圈叉叉後回傳~')
                 ]
             )
 
