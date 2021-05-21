@@ -329,7 +329,7 @@ def handle_content_message(event):
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 diff[x-50:x+49, y-50:y+49, :] = 0
             if len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)) > 0:
-                print(i, j, ' : non-zero')
+                print(i, j, ' : non-zero,   len:', len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)))
                 count_non_zero += 1
 
     pos = np.where(diff != 0)
@@ -340,6 +340,7 @@ def handle_content_message(event):
             TextSendMessage(text='你畫的位置或顏色有點奇怪喔~'),
             TextSendMessage(text='請重傳~')
         ])
+        return
 
     for k in range(2):
         for i in range(num):
@@ -400,16 +401,16 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    # cv2.imwrite('/app/static/tmp/diff.jpg', diff)
-    # url2 = request.url_root + '/static/tmp/diff.jpg'
-    # app.logger.info("url2=" + url2)
+    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    url2 = request.url_root + '/static/tmp/diff.jpg'
+    app.logger.info("url2=" + url2)
 
     url = request.url_root + '/static/tmp/'+filename
     app.logger.info("url=" + url)
 
     line_bot_api.push_message(opponent_id, [
 
-        # ImageSendMessage(url2, url2),
+        ImageSendMessage(url2, url2),
         ImageSendMessage(url, url),
         TextSendMessage(text='輪到你了'),
         TextSendMessage(text='在圖片上畫圈圈叉叉後回傳~')
