@@ -315,7 +315,7 @@ def handle_content_message(event):
     center = [0, 0]
 
     # ! cut grid and none valid grid
-    diff = np.abs(img_new - img_old) > 100
+    diff = np.abs(img_new - img_old)
     diff[85:115, :, :] = 0
     diff[185:215, :, :] = 0
     diff[:, 85:115, :] = 0
