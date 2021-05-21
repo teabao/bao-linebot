@@ -279,17 +279,17 @@ def handle_text_message(event):
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_content_message(event):
     id = event.source.user_id
-    opponent_id = user[id]['opponent_id']
+    # opponent_id = user[id]['opponent_id']
 
-    if not user[id]['is_gaming']:
-        line_bot_api.reply_message(event.reply_token, [
-            TextSendMessage(text='目前還沒有配對~')
-        ])
-        return
-    elif not user[id]['my_turn']:
-        line_bot_api.reply_message(event.reply_token, [
-            TextSendMessage(text='還沒有輪到你哦~')
-        ])
+    # if not user[id]['is_gaming']:
+    #     line_bot_api.reply_message(event.reply_token, [
+    #         TextSendMessage(text='目前還沒有配對~')
+    #     ])
+    #     return
+    # elif not user[id]['my_turn']:
+    #     line_bot_api.reply_message(event.reply_token, [
+    #         TextSendMessage(text='還沒有輪到你哦~')
+    #     ])
 
     ext = 'jpg'
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -305,24 +305,21 @@ def handle_content_message(event):
     # ! image diff check
     img_new = cv2.imread(user[id]['img_backup'])
     img_new = cv2.resize(img_new, (300, 300), interpolation=cv2.INTER_AREA)
-    img_old = cv2.imread(user[opponent_id]['img_backup'])
+    # img_old = cv2.imread(user[opponent_id]['img_backup'])
+    img_old = cv2.imread('/app/static/grid.jpg')
     img_old = cv2.resize(img_old, (300, 300), interpolation=cv2.INTER_AREA)
-
-    print('img_backup')
-    print(user[id]['img_backup'])
-    print(user[opponent_id]['img_backup'])
-    print(img_new.shape)
-    print(img_old.shape)
 
     # center of diff pixel
     center = [0, 0]
 
     # ! cut grid and none valid grid
+    threshold = 100
     diff = np.abs(img_new - img_old)
     diff[85:115, :, :] = 0
     diff[185:215, :, :] = 0
     diff[:, 85:115, :] = 0
     diff[:, 185:215, :] = 0
+    diff[np.where(diff < threshold)] = 0
 
     count_non_zero = 0
     for i in range(3):
@@ -331,19 +328,31 @@ def handle_content_message(event):
             y = j*100+50
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 diff[x-50:x+49, y-50:y+49, :] = 0
-            if len(np.where(diff[x-50:x+49, y-50:y+49, :] > 100)[0]) > 0:
-                print(i, j, ' : non-zero,   len:', len(np.where(diff[x-50:x+49, y-50:y+49, :] > 100)[0]))
+            sub_img = diff[x-50:x+49, y-50:y+49, :]
+            non_zero = len(np.where(sub_img > 100)[0])
+            if non_zero > 0:
+                print(i, j, ' : non-zero,   len:', non_zero)
                 count_non_zero += 1
 
     pos = np.where(diff != 0)
     num = len(pos[0])
 
+    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    url2 = request.url_root + '/static/tmp/diff.jpg'
+    app.logger.info("url2=" + url2)
+
     if num == 0 or count_non_zero > 1 or count_non_zero == 0:
         line_bot_api.reply_message(event.reply_token, [
             TextSendMessage(text='你畫的位置或顏色有點奇怪喔~'),
-            TextSendMessage(text='請重傳~')
+            TextSendMessage(text='請重傳~'),
+            ImageSendMessage(url2, url2)
         ])
         return
+    line_bot_api.reply_message(event.reply_token, [
+        TextSendMessage(text='沒問題~'),
+        ImageSendMessage(url2, url2)
+    ])
+    return
 
     for k in range(2):
         for i in range(num):
