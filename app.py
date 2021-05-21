@@ -315,7 +315,7 @@ def handle_content_message(event):
     center = [0, 0]
 
     # ! cut grid and none valid grid
-    diff = np.abs(img_new - img_old) > 128
+    diff = np.abs(img_new - img_old) > 30
     diff[85:115, :, :] = 0
     diff[185:215, :, :] = 0
     diff[:, 85:115, :] = 0
@@ -328,7 +328,7 @@ def handle_content_message(event):
             y = j*100+50
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 diff[x-50:x+49, y-50:y+49, :] = 0
-            if len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)) > 0:
+            if len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)[0]) > 0:
                 print(i, j, ' : non-zero,   len:', len(np.where(diff[x-50:x+49, y-50:y+49, :] != 0)))
                 count_non_zero += 1
 
