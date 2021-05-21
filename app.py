@@ -134,6 +134,56 @@ def end_msg(event, filename, txt):
     return message
 
 
+def intro_msg():
+    bubble = BubbleContainer(
+        direction='ltr',
+        hero=ImageComponent(
+            url=request.url_root + '/static/poster.jpg',
+            size='full',
+            aspect_ratio='20:13',
+            aspect_mode='cover'
+        ),
+        body=BoxComponent(
+            layout='vertical',
+            contents=[
+                TextComponent(text='Tic Tac Toe (井字遊戲)', weight='bold', size='xl'),
+                BoxComponent(
+                    layout='vertical',
+                    margin='lg',
+                    spacing='sm',
+                    contents=[
+                        TextComponent(
+                            text='在線上隨機配對玩家，挑戰你的對手！',
+                            color='#aaaaaa',
+                            size='sm',
+                            flex=1
+                        )
+                    ],
+                )
+            ],
+        ),
+        footer=BoxComponent(
+            layout='vertical',
+            spacing='sm',
+            contents=[
+                ButtonComponent(
+                    style='link',
+                    height='sm',
+                    action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
+                ),
+                SeparatorComponent(),
+                ButtonComponent(
+                    style='link',
+                    height='sm',
+                    action=MessageAction(label='尋找配對', text='配對')
+                )
+            ]
+        ),
+    )
+    message = FlexSendMessage(alt_text="hello", contents=bubble)
+    return message
+
+
 # ! user_information
 user_waiting = []
 
@@ -223,56 +273,7 @@ def handle_text_message(event):
             ]
         )
     else:
-        bubble = BubbleContainer(
-            direction='ltr',
-            hero=ImageComponent(
-                url=request.url_root + '/static/poster.jpg',
-                size='full',
-                aspect_ratio='20:13',
-                aspect_mode='cover'
-            ),
-            body=BoxComponent(
-                layout='vertical',
-                contents=[
-                    TextComponent(text='Tic Tac Toe (井字遊戲)', weight='bold', size='xl'),
-                    BoxComponent(
-                        layout='vertical',
-                        margin='lg',
-                        spacing='sm',
-                        contents=[
-                            TextComponent(
-                                text='在線上隨機配對玩家，挑戰你的對手！',
-                                color='#aaaaaa',
-                                size='sm',
-                                flex=1
-                            )
-                        ],
-                    )
-                ],
-            ),
-            footer=BoxComponent(
-                layout='vertical',
-                spacing='sm',
-                contents=[
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='Github', uri='https://github.com/teabao/bao-linebot')
-                    ),
-                    SeparatorComponent(),
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=MessageAction(label='尋找配對', text='配對')
-                    )
-                ]
-            ),
-        )
-        message = FlexSendMessage(alt_text="hello", contents=bubble)
-        line_bot_api.reply_message(
-            event.reply_token,
-            message
-        )
+        line_bot_api.reply_message(event.reply_token, intro_msg())
 
 
 @handler.add(MessageEvent, message=ImageMessage)
@@ -314,7 +315,7 @@ def handle_content_message(event):
     center = [0, 0]
 
     # ! cut grid and none valid grid
-    diff = np.abs(img_new - img_old)
+    diff = np.abs(img_new - img_old) > 128
     diff[85:115, :, :] = 0
     diff[185:215, :, :] = 0
     diff[:, 85:115, :] = 0
@@ -336,7 +337,7 @@ def handle_content_message(event):
 
     if num == 0 or count_non_zero > 1 or count_non_zero == 0:
         line_bot_api.reply_message(event.reply_token, [
-            TextSendMessage(text='你畫的位置有點奇怪喔~'),
+            TextSendMessage(text='你畫的位置或顏色有點奇怪喔~'),
             TextSendMessage(text='請重傳~')
         ])
 
