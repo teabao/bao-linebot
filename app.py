@@ -286,7 +286,7 @@ def handle_content_message(event):
             TextSendMessage(text='目前還沒有配對~')
         ])
         return
-    elif not user[id]['my_turn'] or True:
+    elif not user[id]['my_turn']:
         line_bot_api.reply_message(event.reply_token, [
             TextSendMessage(text='還沒有輪到你哦~')
         ])
