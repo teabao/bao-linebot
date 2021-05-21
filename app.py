@@ -299,6 +299,9 @@ def handle_content_message(event):
         filename = tf.name.split('/')[-1]
         user[id]['img_backup'] = tf.name
 
+    url = request.url_root + '/static/tmp/'+filename
+    app.logger.info("url=" + url)
+
     # ! image diff check
     img_new = cv2.imread(user[id]['img_backup'])
     img_new = cv2.resize(img_new, (300, 300), interpolation=cv2.INTER_AREA)
@@ -380,8 +383,15 @@ def handle_content_message(event):
         is_end = True
 
     if is_end:
-        line_bot_api.reply_message(event.reply_token, end_msg(event, 'win.png', '你贏了'))
-        line_bot_api.push_message(opponent_id, end_msg(event, 'cat.jpg', '你輸了'))
+        line_bot_api.reply_message(event.reply_token, [
+            end_msg(event, 'win.png', '你贏了'),
+            intro_msg()
+        ])
+        line_bot_api.push_message(opponent_id, [
+            ImageSendMessage(url, url),
+            end_msg(event, 'cat.jpg', '你輸了'),
+            intro_msg()
+        ])
 
     count = 0
     for i in range(3):
@@ -389,8 +399,15 @@ def handle_content_message(event):
             if not user[id]['valid_grid'][i, j] or not user[opponent_id]['valid_grid'][i, j]:
                 count += 1
     if count == 9 and not is_end:
-        line_bot_api.reply_message(event.reply_token, end_msg(event, 'hand.jpg', '平手'))
-        line_bot_api.push_message(opponent_id, end_msg(event, 'hand.jpg', '平手'))
+        line_bot_api.reply_message(event.reply_token, [
+            end_msg(event, 'hand.jpg', '平手'),
+            intro_msg()
+        ])
+        line_bot_api.push_message(opponent_id, [
+            ImageSendMessage(url, url),
+            end_msg(event, 'hand.jpg', '平手'),
+            intro_msg()
+        ])
         is_end = True
 
     if count == 9 or is_end:
@@ -401,16 +418,13 @@ def handle_content_message(event):
 
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='等待你的對手...'))
 
-    cv2.imwrite('/app/static/tmp/diff.jpg', diff)
-    url2 = request.url_root + '/static/tmp/diff.jpg'
-    app.logger.info("url2=" + url2)
-
-    url = request.url_root + '/static/tmp/'+filename
-    app.logger.info("url=" + url)
+    # cv2.imwrite('/app/static/tmp/diff.jpg', diff)
+    # url2 = request.url_root + '/static/tmp/diff.jpg'
+    # app.logger.info("url2=" + url2)
 
     line_bot_api.push_message(opponent_id, [
 
-        ImageSendMessage(url2, url2),
+        # ImageSendMessage(url2, url2),
         ImageSendMessage(url, url),
         TextSendMessage(text='輪到你了'),
         TextSendMessage(text='在圖片上畫圈圈叉叉後回傳~')
